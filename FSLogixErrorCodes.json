@@ -1,4 +1,6 @@
 {
+  "Title": "FSLogix Error Codes",
+  "Description": "Reason codes for use when troubleshooting FSLogix profile issues.",
   "ErrorCodes": [
     {
       "Code": 0,
