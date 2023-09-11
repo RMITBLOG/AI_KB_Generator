@@ -4,11 +4,12 @@ $APIKEY = "ENTER_API_KEY"
 $Endpoint = "https://avdtech.openai.azure.com/openai/deployments/AVDTEST/chat/completions?api-version=2023-07-01-preview"
 
 
-#$PreInformation = @'
+$PreInformation = @'
 
-#Assume you are working in a standard Windows server environment that primarily uses Microsoft technologies. The server hosts several business applications and is a critical piece of infrastructure.
+Assume you are working in a End User computing team on Azure Virtual Desktop and you are responsible for troubleshooting error codes and producing documentation.
 
-#'@
+'@
+
 
 #----------
 
@@ -66,13 +67,12 @@ if (Test-Path $kbRegisterFile) {
 function DetermineITClassification {
     param (
         [Parameter(Mandatory = $true)]
-        [string]$ErrorMessage,
-        [Parameter(Mandatory = $true)]
-        [string]$OutputText
+        [string]$ErrorMessage
     )
 
     # Define a list of regex patterns and corresponding classifications
     $patternsAndClassifications = @(
+        @{ Pattern = "FSLogix|FSLogix profile|ProfileContainer|OfficeContainer|frx|app attach|disk space|profile storage|FSLogix service|FSLogix logs|FSLogix support|FSLogix VirtualDiskAPI"; Classification = "FSLogix Error" },
         @{ Pattern = "file|directory|path|filesystem|access|permission|disk|storage|backup|restore"; Classification = "File/Storage Error" },
         @{ Pattern = "service|network|communication|connection|port|protocol|firewall|routing"; Classification = "Service/Network Error" },
         @{ Pattern = "process|application|program|software|execution|runtime|crash|hang|freeze|bug|error"; Classification = "Process/Software Error" },
@@ -86,17 +86,9 @@ function DetermineITClassification {
         @{ Pattern = "backup|restore|data loss|corruption|disaster recovery|backup solution"; Classification = "Backup/Restore Error" }
     )
 
-    # Check for FSLogix-related keywords in the error message and output text
-    $fslogixKeywords = "FSLogix|FSLogix profile|ProfileContainer|OfficeContainer|frx|app attach|disk space|profile storage|FSLogix service|FSLogix logs|FSLogix support|FSLogix VirtualDiskAPI"
-    $fslogixClassification = "FSLogix Error"
-
-    if ($ErrorMessage -match $fslogixKeywords -or $OutputText -match $fslogixKeywords) {
-        return $fslogixClassification
-    }
-
     # Loop through patterns and return classification if a match is found
     foreach ($patternAndClassification in $patternsAndClassifications) {
-        if ($ErrorMessage -match $patternAndClassification.Pattern -or $OutputText -match $patternAndClassification.Pattern) {
+        if ($ErrorMessage -match $patternAndClassification.Pattern) {
             return $patternAndClassification.Classification
         }
     }
@@ -104,8 +96,6 @@ function DetermineITClassification {
     # If no specific classification is found, return a default classification
     return "Uncategorized"
 }
-
-
 
 
 
@@ -445,4 +435,6 @@ foreach ($errorMessage in $errorMessages) {
     Write-Host "Processing error: $errorMessage"
     Handle-Error -ErrorMessage $errorMessage
     Write-Host "`n" # for better readability between messages
+}
+
 }
