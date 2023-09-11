@@ -3,6 +3,7 @@
 $APIKEY = "ENTER_API_KEY"
 $Endpoint = "https://avdtech.openai.azure.com/openai/deployments/AVDTEST/chat/completions?api-version=2023-07-01-preview"
 
+
 #$PreInformation = @'
 
 #Assume you are working in a standard Windows server environment that primarily uses Microsoft technologies. The server hosts several business applications and is a critical piece of infrastructure.
@@ -65,40 +66,48 @@ if (Test-Path $kbRegisterFile) {
 function DetermineITClassification {
     param (
         [Parameter(Mandatory = $true)]
-        [string]$ErrorMessage
+        [string]$ErrorMessage,
+        [Parameter(Mandatory = $true)]
+        [string]$OutputText
     )
 
-    # Logic to determine IT classification based on the error message
+    # Define a list of regex patterns and corresponding classifications
+    $patternsAndClassifications = @(
+        @{ Pattern = "file|directory|path|filesystem|access|permission|disk|storage|backup|restore"; Classification = "File/Storage Error" },
+        @{ Pattern = "service|network|communication|connection|port|protocol|firewall|routing"; Classification = "Service/Network Error" },
+        @{ Pattern = "process|application|program|software|execution|runtime|crash|hang|freeze|bug|error"; Classification = "Process/Software Error" },
+        @{ Pattern = "database|SQL|query|table|record|schema|connection|transaction"; Classification = "Database Error" },
+        @{ Pattern = "hardware|device|driver|firmware|motherboard|CPU|RAM|disk|keyboard|mouse|monitor"; Classification = "Hardware Error" },
+        @{ Pattern = "authentication|authorization|login|credentials|token|session|security|SSL|TLS"; Classification = "Authentication/Security Error" },
+        @{ Pattern = "DNS|domain|hostname|IP address|routing|DNS server|DNS resolution|DNS cache"; Classification = "DNS/Host Resolution Error" },
+        @{ Pattern = "email|SMTP|IMAP|POP3|email server|send|receive|mailbox|outlook|thunderbird|email client"; Classification = "Email/Communication Error" },
+        @{ Pattern = "website|web server|HTTP|HTTPS|URL|webpage|browser|web application|web service"; Classification = "Website/Web Application Error" },
+        @{ Pattern = "printer|printing|print queue|paper jam|printer driver|scanner|fax|printing service"; Classification = "Printer/Printing Error" },
+        @{ Pattern = "backup|restore|data loss|corruption|disaster recovery|backup solution"; Classification = "Backup/Restore Error" }
+    )
 
-    if ($ErrorMessage -match "file|directory|path|filesystem|access|permission|disk|storage|backup|restore") {
-        return "File/Storage Error"
-    } elseif ($ErrorMessage -match "service|network|communication|connection|port|protocol|firewall|routing") {
-        return "Service/Network Error"
-    } elseif ($ErrorMessage -match "process|application|program|software|execution|runtime|crash|hang|freeze|bug|error") {
-        return "Process/Software Error"
-    } elseif ($ErrorMessage -match "database|SQL|query|table|record|schema|connection|transaction") {
-        return "Database Error"
-    } elseif ($ErrorMessage -match "hardware|device|driver|firmware|motherboard|CPU|RAM|disk|keyboard|mouse|monitor") {
-        return "Hardware Error"
-    } elseif ($ErrorMessage -match "authentication|authorization|login|credentials|token|session|security|SSL|TLS") {
-        return "Authentication/Security Error"
-    } elseif ($ErrorMessage -match "DNS|domain|hostname|IP address|routing|DNS server|DNS resolution|DNS cache") {
-        return "DNS/Host Resolution Error"
-    } elseif ($ErrorMessage -match "email|SMTP|IMAP|POP3|email server|send|receive|mailbox|outlook|thunderbird|email client") {
-        return "Email/Communication Error"
-    } elseif ($ErrorMessage -match "website|web server|HTTP|HTTPS|URL|webpage|browser|web application|web service") {
-        return "Website/Web Application Error"
-    } elseif ($ErrorMessage -match "printer|printing|print queue|paper jam|printer driver|scanner|fax|printing service") {
-        return "Printer/Printing Error"
-    } elseif ($ErrorMessage -match "backup|restore|data loss|corruption|disaster recovery|backup solution") {
-        return "Backup/Restore Error"
-    } elseif ($ErrorMessage -match "FSLogix|ProfileContainer|OfficeContainer|frx|app attach") { #FSLogix specific keywords
-        return "FSLogix Error"
+    # Check for FSLogix-related keywords in the error message and output text
+    $fslogixKeywords = "FSLogix|FSLogix profile|ProfileContainer|OfficeContainer|frx|app attach|disk space|profile storage|FSLogix service|FSLogix logs|FSLogix support|FSLogix VirtualDiskAPI"
+    $fslogixClassification = "FSLogix Error"
+
+    if ($ErrorMessage -match $fslogixKeywords -or $OutputText -match $fslogixKeywords) {
+        return $fslogixClassification
+    }
+
+    # Loop through patterns and return classification if a match is found
+    foreach ($patternAndClassification in $patternsAndClassifications) {
+        if ($ErrorMessage -match $patternAndClassification.Pattern -or $OutputText -match $patternAndClassification.Pattern) {
+            return $patternAndClassification.Classification
+        }
     }
 
     # If no specific classification is found, return a default classification
     return "Uncategorized"
 }
+
+
+
+
 
 
 function Get-OpenAIErrorResponse {
