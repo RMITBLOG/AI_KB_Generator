@@ -1,13 +1,13 @@
 ##CONFIG
 
-$APIKEY = "Enter_API_KEY"
-$Endpoint = "https://<NAME>.openai.azure.com/openai/deployments/<DEPLOYMENTNAME>/chat/completions?api-version=2023-07-01-preview"
-#Ensure you update the API KEY and Endpoint
-$PreInformation = @'
+$APIKEY = "ENTER_API_KEY"
+$Endpoint = "https://avdtech.openai.azure.com/openai/deployments/AVDTEST/chat/completions?api-version=2023-07-01-preview"
 
-Assume you are working in a standard Windows server environment that primarily uses Microsoft technologies. The server hosts several business applications and is a critical piece of infrastructure.
+#$PreInformation = @'
 
-'@
+#Assume you are working in a standard Windows server environment that primarily uses Microsoft technologies. The server hosts several business applications and is a critical piece of infrastructure.
+
+#'@
 
 #----------
 
@@ -16,6 +16,28 @@ $directoryPath = "C:\temp\KBCollection"
 if (-not (Test-Path $directoryPath)) {
     New-Item -ItemType Directory -Path $directoryPath
 }
+
+
+
+#FSLOGIX Loading
+$FslogixCodes = "$directoryPath\FSLogixErrorCodes.json"
+
+# Specify the URL to download from
+$url = "https://raw.githubusercontent.com/RMITBLOG/AI_KB_Generator/main/FSLogixErrorCodes.json"
+
+
+# Check if the file already exists
+if (-not (Test-Path $FslogixCodes)) {
+    # File doesn't exist, download it
+    Invoke-WebRequest -Uri $url -OutFile $FslogixCodes
+    Write-Output "File downloaded successfully to $FslogixCodes"
+} else {
+    Write-Output "File already exists at $FslogixCodes"
+}
+
+$fslogixErrorscodes = Get-Content -Path $FslogixCodes | ConvertFrom-Json
+
+
 
 # Set the paths for the log and register files within the directory
 $errorLogFile = "$directoryPath\Log.json"
@@ -70,11 +92,14 @@ function DetermineITClassification {
         return "Printer/Printing Error"
     } elseif ($ErrorMessage -match "backup|restore|data loss|corruption|disaster recovery|backup solution") {
         return "Backup/Restore Error"
+    } elseif ($ErrorMessage -match "FSLogix|ProfileContainer|OfficeContainer|frx|app attach") { #FSLogix specific keywords
+        return "FSLogix Error"
     }
 
     # If no specific classification is found, return a default classification
     return "Uncategorized"
 }
+
 
 function Get-OpenAIErrorResponse {
     param (
@@ -94,7 +119,8 @@ function Get-OpenAIErrorResponse {
     }
     $body = @{
         messages = @(
-            @{ role = "system"; content = $PreInformation },  # Add pre-information here
+            @{ role = "system"; content = $PreInformation  },  # Add pre-information here
+            @{ role = "system"; content = $fslogixErrorscodes },  # Add pre-information here
             @{ role = "system"; content = "You are an IT professional looking for technical answers to help resolve the $Classification error." },
             @{ role = "user"; content = "How to fix error: $Error" }
         )
@@ -105,6 +131,10 @@ function Get-OpenAIErrorResponse {
         top_p             = 0.95
         stop              = $null
     } | ConvertTo-Json
+
+
+     #Write-Output "Sending request body to OpenAI: $body"
+  
 
     try {
         $response = Invoke-RestMethod -Uri $apiEndpoint -Method Post -Headers $headers -Body $body
@@ -160,6 +190,14 @@ if ($existingMarkdownFile) {
     return
 }
 
+# Check if the error message matches any FSLogix error codes
+$fslogixError = $fslogixErrors | Where-Object { $ErrorMessage -match $_.ErrorCode }
+if ($fslogixError) {
+    # Append FSLogix error information to the pre-information content
+    $PreInformation += "`n" + $fslogixError.Description
+}
+
+
 
      $existingError = $errorsList | Where-Object { $_.error -eq $ErrorMessage }
     if ($existingError) {
@@ -199,7 +237,7 @@ if ($existingMarkdownFile) {
                     "KB" = $errorCode
                     "title" = $title
                     "category" = $itClassification
-                    "timestamp" = $timestamp
+                    
                 }
 
                 $kbRegister += $kbEntry
@@ -348,3 +386,54 @@ try {
 '@
 Write-Host $scriptText3
 Invoke-Expression -Command $scriptText3
+
+# Test 4 - Simulating error codes 
+Write-Host "`nRunning script:" -ForegroundColor Yellow
+$scriptText4 = @'
+try {
+    # Simulating an error for testing purposes
+    if ($true) {
+        throw "Error encountered with code 0x87D00207"
+    }
+
+   
+} catch {
+    Handle-Error -ErrorMessage $_.Exception.Message
+}
+'@
+Write-Host $scriptText4
+Invoke-Expression -Command $scriptText4
+
+# Test 5 - Simulating FSLogix error codes 
+
+# Sample error messages
+$errorMessages = @(
+    "[07:31:01.429][tid:00000d30.00004c04][ERROR:000000b7]  No Create access: \\fslfileserver\profiles\jdoe-S-1-2-34-000000000-000000000-0000000000-00000000-test (Cannot create a file when that file already exists.)",
+    "[07:31:01.432][tid:00000d30.00004c04][ERROR:000000b7]  LoadProfile failed. Version: 2.9.8308.44092 User: jdoe. SID: S-1-2-34-000000000-000000000-0000000000-00000000. SessionId: 11. FrxStatus: 31 (Cannot create a file when that file already exists.)",
+    "[11:35:33.734][tid:00000d30.00004f38][ERROR:00000005]  VirtualDiskAPI::CreateFormattedDisk failed to create vhd(x): \\fslfileserver\profiles\jdoe-S-1-2-34-000000000-000000000-0000000000-00000000\Profile_jdoe.vhdx (Access is denied.)",
+    "[11:35:59.241][tid:00000d30.00004f38][ERROR:80070003]  Failed to save installed AppxPackages (The system cannot find the path specified.)"
+)
+
+# Loop through each error message and pass it to the Handle-Error function
+foreach ($errorMessage in $errorMessages) {
+    Write-Host "Processing error: $errorMessage"
+    Handle-Error -ErrorMessage $errorMessage
+    Write-Host "`n" # for better readability between messages
+}
+
+
+# Test 6 - Simulating FSLogix reason codes 
+
+# Sample error messages
+$errorMessages = @(
+    "[07:26:39.015][tid:00000d30.000044b4][INFO]             Volume name: \\?\Volume{c04ba195-522c-40b8-a894-879025d9b386}\",
+    "[07:26:39.015][tid:00000d30.000044b4][INFO]             Reason set to 0: The container is attached",
+    "[07:26:39.015][tid:00000d30.000044b4][INFO]             queryFreeDiskSpace returning after 0 milliseconds"
+)
+
+# Loop through each error message and pass it to the Handle-Error function
+foreach ($errorMessage in $errorMessages) {
+    Write-Host "Processing error: $errorMessage"
+    Handle-Error -ErrorMessage $errorMessage
+    Write-Host "`n" # for better readability between messages
+}
