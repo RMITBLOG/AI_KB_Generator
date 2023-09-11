@@ -1,0 +1,248 @@
+{
+  "ErrorCodes": [
+    {
+      "Code": 0,
+      "Type": "Normal",
+      "Description": "STATUS_SUCCESS",
+      "Explanation": "Success"
+    },
+    {
+      "Code": 1,
+      "Type": "Error",
+      "Description": "ERROR",
+      "Explanation": "Can't load user's profile"
+    },
+    {
+      "Code": 2,
+      "Type": "Error",
+      "Description": "ERROR_VIRT_DLL",
+      "Explanation": "Virtual disk API isn't available on this platform"
+    },
+    {
+      "Code": 3,
+      "Type": "Error",
+      "Description": "ERROR_GET_USER",
+      "Explanation": "Can't retrieve user's security identifier"
+    },
+    {
+      "Code": 4,
+      "Type": "Error",
+      "Description": "ERROR_HANDLE_ODFC",
+      "Explanation": "There was an error setting up the Office 365 Container"
+    },
+    {
+      "Code": 5,
+      "Type": "Error",
+      "Description": "ERROR_SECURITY",
+      "Explanation": "Can't retrieve security information"
+    },
+    {
+      "Code": 6,
+      "Type": "Error",
+      "Description": "ERROR_VHD_PATH",
+      "Explanation": "Can't retrieve virtual disk location"
+    },
+    {
+      "Code": 7,
+      "Type": "Error",
+      "Description": "ERROR_CREATE_DIR",
+      "Explanation": "Can't create destination folders"
+    },
+    {
+      "Code": 8,
+      "Type": "Error",
+      "Description": "ERROR_IMPERSONATION",
+      "Explanation": "Can't impersonate user"
+    },
+    {
+      "Code": 9,
+      "Type": "Error",
+      "Description": "ERROR_CREATE_VHD",
+      "Explanation": "Can't create virtual disk"
+    },
+    {
+      "Code": 10,
+      "Type": "Error",
+      "Description": "ERROR_CLOSE_HANDLE",
+      "Explanation": "Can't release virtual disk"
+    },
+    {
+      "Code": 11,
+      "Type": "Error",
+      "Description": "ERROR_OPEN_VHD",
+      "Explanation": "Can't open virtual disk"
+    },
+    {
+      "Code": 12,
+      "Type": "Error",
+      "Description": "ERROR_ATTACH_VHD",
+      "Explanation": "Can't attach to virtual disk"
+    },
+    {
+      "Code": 13,
+      "Type": "Error",
+      "Description": "ERROR_GET_PHYSICAL_PATH",
+      "Explanation": "Can't retrieve virtual disk's physical information"
+    },
+    {
+      "Code": 14,
+      "Type": "Error",
+      "Description": "ERROR_OPEN_DEVICE",
+      "Explanation": "Can't open virtual disk's volume"
+    },
+    {
+      "Code": 15,
+      "Type": "Error",
+      "Description": "ERROR_INIT_DISK",
+      "Explanation": "Can't initialize virtual disk"
+    },
+    {
+      "Code": 16,
+      "Type": "Error",
+      "Description": "ERROR_GET_VOL_GUID",
+      "Explanation": "Can't retrieve virtual disk identifier"
+    },
+    {
+      "Code": 17,
+      "Type": "Error",
+      "Description": "ERROR_FORMAT_VOL",
+      "Explanation": "Error while formatting virtual disk"
+    },
+    {
+      "Code": 18,
+      "Type": "Error",
+      "Description": "ERROR_GET_PROFILE_DIR",
+      "Explanation": "Can't retrieve profile directory"
+    },
+    {
+      "Code": 19,
+      "Type": "Error",
+      "Description": "ERROR_SET_MOUNT_POINT",
+      "Explanation": "Can't set up directory mount point"
+    },
+    {
+      "Code": 20,
+      "Type": "Error",
+      "Description": "ERROR_REG_IMPORT",
+      "Explanation": "Can't import registry information"
+    },
+    {
+      "Code": 21,
+      "Type": "Error",
+      "Description": "ERROR_CHK_GRP_MEMBERSHIP",
+      "Explanation": "Can't retrieve user's group"
+    },
+    {
+      "Code": 22,
+      "Type": "Error",
+      "Description": "ERROR_HANDLE_PROFILE",
+      "Explanation": "Error handling profile"
+    },
+    {
+      "Code": 23,
+      "Type": "Error",
+      "Description": "ERROR_PROFILE_SUBFOLDER_REDIRECTION",
+      "Explanation": "Can't set up folder redirections"
+    },
+    {
+      "Code": 24,
+      "Type": "Error",
+      "Description": "ERROR_CREATE_EVENT",
+      "Explanation": "Unable to create event"
+    },
+    {
+      "Code": 25,
+      "Type": "Error",
+      "Description": "ERROR_PER_SESSION_VHD",
+      "Explanation": "Maximum sessions reached"
+    },
+    {
+      "Code": 26,
+      "Type": "Error",
+      "Description": "ERROR_DETACH_VHD",
+      "Explanation": "Can't detach virtual disk at the provided location"
+    },
+    {
+      "Code": 27,
+      "Type": "Error",
+      "Description": "ERROR_FIND_VHD",
+      "Explanation": "Can't find virtual disk at the provided location"
+    },
+    {
+      "Code": 28,
+      "Type": "Error",
+      "Description": "ERROR_NO_SESSION_CONFIG",
+      "Explanation": "No user session config found"
+    },
+    {
+      "Code": 100,
+      "Type": "Normal",
+      "Description": "STATUS_WAITING_FOR_PROFILE_DIR_SET",
+      "Explanation": "Waiting for the Windows Profile Service to determine the user's profile folder"
+    },
+    {
+      "Code": 200,
+      "Type": "Normal",
+      "Description": "STATUS_IN_PROGRESS",
+      "Explanation": "Setup in progress"
+    },
+    {
+      "Code": 300,
+      "Type": "Normal",
+      "Description": "STATUS_ALREADY_ATTACHED",
+      "Explanation": "The profile is already attached (differencing disks only)"
+    }
+  ],
+  "ReasonCodes": [
+    {
+      "Code": 0,
+      "Description": "REASON_PROFILE_ATTACHED",
+      "Explanation": "The container is attached"
+    },
+    {
+      "Code": 1,
+      "Description": "REASON_NOT_IN_WHITE_LIST",
+      "Explanation": "User isn't a member of the include group"
+    },
+    {
+      "Code": 2,
+      "Description": "REASON_IN_BLACK_LIST",
+      "Explanation": "User is a member of the exclude group"
+    },
+    {
+      "Code": 3,
+      "Description": "REASON_LOCAL_PROFILE_EXISTS",
+      "Explanation": "A local profile for this user exists on this system"
+    },
+    {
+      "Code": 4,
+      "Description": "REASON_SHORT_SID",
+      "Explanation": "Not an appropriate user type"
+    },
+    {
+      "Code": 5,
+      "Description": "REASON_UNSET",
+      "Explanation": "Reason initialized to an empty state"
+    },
+    {
+      "Code": 6,
+      "Description": "REASON_COMPONENT_NOT_ENABLED",
+      "Explanation": "Component isn't enabled in the product key (legacy)"
+    },
+    {
+      "Code": 7,
+      "Description": "REASON_WINDOWS_TEMP_PROFILE",
+      "Explanation": "Profile is a Windows temporary profile"
+    },
+    {
+      "Code": 8,
+      "Description": "REASON_NOT_WVD_SESSION",
+      "Explanation": "Session isn't an Azure Virtual Desktop Session"
+    },
+    {
+      "Code": 9,
+      "Description": "REASON_FAILED_TO_LOAD_PROFILE",
+      "Explanation": "Profile load failed"
+    }
+  ]
+}
