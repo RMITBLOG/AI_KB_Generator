@@ -62,7 +62,11 @@ if (Test-Path $kbRegisterFile) {
     $kbRegister = @()
 }
 
-
+function Get-UniqueRefCode {
+    # Generate a unique 8-digit reference code starting with "KB_"
+    $refCode = "KB_" + (Get-Random -Minimum 10000000 -Maximum 99999999)
+    return $refCode
+}
 
 function DetermineITClassification {
     param (
