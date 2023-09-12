@@ -1,7 +1,7 @@
 ##CONFIG
 
-$APIKEY = "ENTER_API_KEY"
-$Endpoint = "https://avdtech.openai.azure.com/openai/deployments/AVDTEST/chat/completions?api-version=2023-07-01-preview"
+$APIKEY = "ENTER_API_KEY_HERE"
+$Endpoint = "ENTER_ENDPOINT_HERE"
 
 
 $PreInformation = @'
@@ -19,6 +19,11 @@ if (-not (Test-Path $directoryPath)) {
     New-Item -ItemType Directory -Path $directoryPath
 }
 
+function Get-UniqueRefCode {
+    # Generate a unique 8-digit reference code starting with "KB_"
+    $refCode = "KB_" + (Get-Random -Minimum 10000000 -Maximum 99999999)
+    return $refCode
+}
 
 
 #FSLOGIX Loading
@@ -62,11 +67,7 @@ if (Test-Path $kbRegisterFile) {
     $kbRegister = @()
 }
 
-function Get-UniqueRefCode {
-    # Generate a unique 8-digit reference code starting with "KB_"
-    $refCode = "KB_" + (Get-Random -Minimum 10000000 -Maximum 99999999)
-    return $refCode
-}
+
 
 function DetermineITClassification {
     param (
@@ -157,7 +158,47 @@ function Get-OpenAIErrorResponse {
 }
 
 
+function Get-OpenAITitleResponse {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Error
+    )
 
+    # Call OpenAI to get a more relevant title based on the error message
+    # Modify the $body and API call as needed
+
+    $apiEndpoint = $Endpoint
+    $headers = @{
+        "Content-Type" = "application/json"
+        "api-key"      = $APIKEY  # Replace with your OpenAI API key
+    }
+    $body = @{
+        messages = @(
+            @{ role = "system"; content = "You are an IT professional looking for a relevant title for the error." },
+            @{ role = "user"; content = "Generate a title for the error: $Error" }
+        )
+        max_tokens        = 50  # Adjust max tokens as needed for your title length
+        temperature       = 0.7
+        frequency_penalty = 0
+        presence_penalty  = 0
+        top_p             = 0.95
+        stop              = $null
+    } | ConvertTo-Json
+
+    try {
+        $response = Invoke-RestMethod -Uri $apiEndpoint -Method Post -Headers $headers -Body $body
+        if ($response -and $response.choices -and $response.choices.Count -gt 0 -and $response.choices[0].message) {
+            $titleResponse = $response.choices[0].message.content
+            return $titleResponse
+        } else {
+            Write-Error "Unexpected response format from OpenAI for title generation"
+            return $null
+        }
+    } catch {
+        Write-Error "Failed to fetch title response from OpenAI: $_"
+        return $null
+    }
+}
 
 
 function Handle-Error {
@@ -441,4 +482,3 @@ foreach ($errorMessage in $errorMessages) {
     Write-Host "`n" # for better readability between messages
 }
 
-}
